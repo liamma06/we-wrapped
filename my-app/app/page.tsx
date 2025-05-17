@@ -47,13 +47,51 @@ export default function SpotlightNewDemo() {
   return (
     <div className=" w-full rounded-md flex flex-col md:items-center md:justify-center content-center bg-black/[0.1] antialiased relative overflow-hidden">
       <Spotlight />
-      <div className="h-screen flex items-center justify-center">
-        <h1 className="text-center">WE Wrapped: A smarter look at your school year.</h1>
+
+
+      <div className="h-screen flex flex-col items-center justify-center ">
+
+        {/* Title */}
+        <div className="text-center">
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-sm">
+            WE Wrapped
+          </h1>
+          <p className="mt-4 text-lg md:text-xl text-gray-300">
+            A <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-900 via-purple-500 to-white"> smarter</span> look at your school year.
+          </p>
+        </div>
+        
+        <div className="flex items-center justify-center mt-2">
+
+          {/* Scroll button */}
+          <button
+          onClick={() => {
+            const el = document.getElementById("about-section");
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
+          className=" bottom-5 left-1/2 z-50 -translate-x-1/2 transform rounded-full p-3 backdrop-blur hover:bg-white/20"
+          >
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white animate-bounce"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <button> Hello</button>
+        </div>
+
       </div>
 
-      <button> </button>
-
-       <div className="flex items-center justify-center w-screen h-screen">
+      
+      
+       <div id= "about-section" className="flex items-center justify-center w-screen h-screen">
         <StickyScroll content={content} />
       </div>
 
