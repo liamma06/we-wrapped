@@ -3,6 +3,8 @@ import React from "react";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { StickyScroll } from "@/components/ui/sticky-scroll-reveal";
 
+import Link from 'next/link'
+
 const content = [
   {
     title: "Collaborative Editing",
@@ -61,7 +63,8 @@ export default function SpotlightNewDemo() {
           </p>
         </div>
         
-        <div className="flex items-center justify-center mt-2">
+        {/* button container */}
+        <div className="flex items-center justify-center mt-2 gap-8">
 
           {/* Scroll button */}
           <button
@@ -84,7 +87,7 @@ export default function SpotlightNewDemo() {
             </svg>
           </button>
 
-          <button> Hello</button>
+          <button className="px-5 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition duration-300"><Link href={'/signup'}>Get Started</Link></button>
         </div>
 
       </div>
