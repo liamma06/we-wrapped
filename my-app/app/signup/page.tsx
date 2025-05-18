@@ -57,6 +57,27 @@ export default function Signup() {
 
     return (
         <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        {/* Back button*/}
+        <Link 
+            href="/" 
+            className="absolute top-6 left-6 text-white hover:text-purple-400 transition-colors flex items-center"
+        >
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-6 w-6 mr-1" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+            >
+                <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18" 
+                />
+            </svg>
+            <span>Back</span>
+        </Link>
         <div className="w-full max-w-md p-8 space-y-6 bg-neutral-900 border border-neutral-800 rounded-xl shadow-md">
             <h2 className="text-2xl font-semibold text-white text-center">Sign Up</h2>
             <form onSubmit={HandleSignup}className="space-y-4">
