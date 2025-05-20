@@ -57,7 +57,7 @@ export default function Dashboard(){
                 
                 {/*Actual Content*/}
                 <div className="fixed inset-0 flex items-center justify-center z-20">
-                    <div className="bg-neutral-900 rounded-xl p-8 max-w-md w-full ">
+                    <div className="bg-neutral-900 rounded-xl p-8 max-w-md w-full">
                         <h2 className="text-xl font-bold text-white mb-4 text-center">Welcome {user?.email}!</h2>
                         
                         <p className="text-gray-300 mb-6 text-justify">
@@ -67,7 +67,7 @@ export default function Dashboard(){
                         
                         <div className="flex justify-center space-x-4">
                             <button 
-                                onClick={() => router.push('/input-marks')}
+                                onClick={() => router.push('/dashboard/marks')}
                                 className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors"
                             >
                                 Input My Marks
