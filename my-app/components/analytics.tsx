@@ -25,9 +25,10 @@ interface AnalyticsData {
     }[];
 }
 
-export default function Analytics({ userId }: AnalyticsProps) {
+export default function Analytics({ userId: initialUserId }: AnalyticsProps) {
     const [loading, setLoading] = useState(true);
     const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+    const [userId, setUserId] = useState<string>(initialUserId);
 
     useEffect(() => {
         async function loadClassAverages() {
@@ -152,8 +153,8 @@ export default function Analytics({ userId }: AnalyticsProps) {
                 
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 
-                if (authUser && userId !== authUser.id) {
-                    userId = authUser.id;
+                if (authUser && initialUserId !== authUser.id) {
+                    setUserId(authUser.id);
                 }
                 
                 let userYWA = null;

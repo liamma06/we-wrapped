@@ -99,7 +99,7 @@ export default function Marks() {
                 }
                 
                 // Get course data
-                const { data: coursesData } = await supabase
+                const { data: _coursesData } = await supabase
                     .from('courses')
                     .select('*');
                 
