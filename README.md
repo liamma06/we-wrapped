@@ -18,4 +18,4 @@ A simple app that helps first-year engineering students track their course grade
 - Responsive UI
 
 # Thoughts/reflections
-First time creating an application. Learned a lot(did have help from Copilot🥰). 
+First time creating an application. Learned a lot(did have help from Copilot🥰) and got lots more to learn. 
