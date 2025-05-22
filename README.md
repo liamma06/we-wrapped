@@ -3,7 +3,7 @@
 A simple app that helps first-year engineering students track their course grades.
 
 ## 🔗 Live Demo
-[Click here to view the app](https://myschoolapp.vercel.app)
+[Check it Out!](https://we-wrapped.vercel.app/)
 
 ## 🛠️ Tech Stack
 - Next.js
@@ -18,4 +18,4 @@ A simple app that helps first-year engineering students track their course grade
 - Responsive UI
 
 # Thoughts/reflections
-First time creating an application. Learned a lot(did have help from Copilot🥰).
+First time creating an application. Learned a lot(did have help from Copilot🥰). 
