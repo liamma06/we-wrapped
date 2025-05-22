@@ -80,7 +80,75 @@ export default function Dashboard(){
                     </div>
                 </>
             )}
-            <h1>Welcome</h1>
+            {/* Main Dashboard Content */}
+            <div className="max-w-5xl mx-auto mt-8">
+                <div className="bg-neutral-900 rounded-xl shadow-lg overflow-hidden">
+                    <div className="p-6">
+                        <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
+                        
+                        {/* Marks Management */}
+                        <div className="bg-neutral-800 p-5 rounded-lg mb-6">
+                            <h2 className="text-xl text-white font-medium">Your Marks</h2>
+                            <div className="flex justify-between items-center mt-4">
+                                <p className="text-gray-400">
+                                    Manage your course marks and see how they affect your Year Weighted Average.
+                                </p>
+                                <Link href="/dashboard/marks" className="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm transition-colors">
+                                        Edit Marks
+                                </Link>
+                            </div>
+                            
+                        </div>
+                        
+                        {/* Analytics Section */}
+                        <div className="bg-neutral-800 p-5 rounded-lg mb-6">
+                            <h2 className="text-xl text-white font-medium mb-4">Your Analytics</h2>
+                            
+                            {/* Placeholder for Analytics Content - Empty Box */}
+                            <div className="bg-neutral-700/50 rounded-lg p-6 min-h-[300px] flex items-center justify-center">
+                                <div className="text-center">
+                                    <p className="text-gray-400 mb-3">Your analytics will appear here once you've entered your marks.</p>
+                                    <div className="inline-block px-4 py-2 bg-neutral-600 rounded-full text-gray-300 text-sm">
+                                        Analytics Coming Soon
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* User Profile */}
+                        <div className="bg-neutral-800 p-5 rounded-lg">
+                            <h2 className="text-xl text-white font-medium mb-3">Your Profile</h2>
+                            <div className="flex items-center space-x-4">
+                                <div className="w-12 h-12 bg-neutral-700 rounded-full flex items-center justify-center">
+                                    <span className="text-lg text-white font-medium">
+                                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p className="text-white font-medium">{user?.email}</p>
+                                </div>
+                                
+                                <div className="ml-auto">
+                                    <button 
+                                        onClick={async () => {
+                                            await supabase.auth.signOut();
+                                            router.push('/login');
+                                        }}
+                                        className="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 rounded text-white text-sm transition-colors"
+                                    >
+                                        Sign Out
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {/* Footer */}
+                <div className="mt-6 text-center text-gray-500 text-sm">
+                    &copy; {new Date().getFullYear()} WE Wrapped - All rights reserved
+                </div>
+            </div>
         </div>
     )
 }
