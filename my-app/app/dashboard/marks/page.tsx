@@ -13,12 +13,18 @@ type UserMark = {
   };
 }
 
+// Define User type to replace any
+type User = {
+  id: string;
+  email?: string;
+  [key: string]: any; // Allow for other properties that might be in the session user
+}
+
 export default function Marks() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-    const [user, setUser] = useState<any>(null);
+    const [saving, setSaving] = useState(false);    const [error, setError] = useState('');
+    const [user, setUser] = useState<User | null>(null);
     const [cohort, setCohort] = useState('');
 
     // State for course marks
@@ -85,8 +91,7 @@ export default function Marks() {
                 }
                 
                 setUser(session.user);
-                
-                // Get user profile
+                  // Get user profile
                 const { data: profile, error: profileError } = await supabase
                     .from('student_profiles')
                     .select('*')
@@ -97,21 +102,28 @@ export default function Marks() {
                     setCohort(profile.cohort || '');
                     setChoice(profile.engineering_choice || '');
                 }
-                
-                // Get course data
-                const { data: _coursesData } = await supabase
+                  // Get course data
+                const { data: coursesData } = await supabase
                     .from('courses')
                     .select('*');
                 
-                // Get user's marks with proper join
-                const { data: userMarks, error: marksError } = await supabase
+                // Log or use coursesData to avoid unused variable warning
+                console.log('Courses loaded:', coursesData?.length || 0);                
+                const result = await supabase
                     .from('student_marks')
                     .select(`
                         mark,
                         course_id,
                         courses:course_id(id, course_name)
                     `)
-                    .eq('user_id', session.user.id) as { data: UserMark[] | null, error: any };
+                    .eq('user_id', session.user.id);
+
+                const userMarks = result.data as UserMark[] | null;
+                const marksError = result.error;
+
+                if (marksError) {
+                    console.error('Error fetching marks:', marksError);
+                }
 
                 console.log('User marks from DB:', userMarks); // Add this for debugging
 
@@ -159,10 +171,10 @@ export default function Marks() {
                 setError('Failed to load your data. Please try again.');
             } finally {
                 setLoading(false);
-            }
-        }
+            }        }
         
         loadUserData();
+    // Only run once when component mounts or router changes
     }, [router]);
 
     // Handle mark input changes
@@ -191,8 +203,7 @@ export default function Marks() {
             
             // Calculate YWA
             const ywa = calculateYWA();
-            
-            // Save/update profile with YWA
+              // Save/update profile with YWA
             const { error: profileError } = await supabase
                 .from('student_profiles')
                 .upsert({
@@ -200,8 +211,7 @@ export default function Marks() {
                     cohort,
                     engineering_choice: choice,
                     year_weighted_avg: ywa,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'user_id' });
+                    updated_at: new Date().toISOString()                }, { onConflict: 'user_id' });
             
             if (profileError) throw profileError;
             
