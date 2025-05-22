@@ -39,7 +39,7 @@ export default function Signup() {
         
         // Sign up with Supabase
         try{
-            let { data, error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
             })
@@ -48,9 +48,10 @@ export default function Signup() {
 
             console.log('User signed up:', data.user);
             router.push('/login');
-        }catch (error: any) {
-            setError('Error signing up: ' + error.message);
-        }finally{
+        } catch (error: Error | unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            setError('Error signing up: ' + errorMessage);
+        } finally {
             setLoading(false);
         }
     }

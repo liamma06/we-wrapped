@@ -41,9 +41,10 @@ export default function Login(){
             if (error) throw error;
             console.log('User logged in:', data.user);
             router.push('/dashboard');
-        }catch (error: any) {
-            setError('Error logging in: ' + error.message);
-        }finally{
+        } catch (error: Error | unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            setError('Error logging in: ' + errorMessage);
+        } finally {
             setLoading(false);
         }
     }
@@ -105,7 +106,7 @@ export default function Login(){
           </button>
         </form>
         <p className="text-sm text-center text-neutral-400">
-          Don't have account yet?{" "}
+          Don&apos;t have account yet?{" "}
           <button className="text-purple-400 hover:text-purple-300 underline"><Link href={'/signup'}>Sign Up</Link></button>
         </p>
       </div>

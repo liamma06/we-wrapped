@@ -13,19 +13,24 @@ type UserMark = {
   };
 }
 
-// Define User type to replace any
+// Define User type with specific properties
 type User = {
   id: string;
   email?: string;
-  [key: string]: any; // Allow for other properties that might be in the session user
+  created_at?: string;
+  last_sign_in_at?: string;
+  // Fix explicit any
+  [key: string]: string | boolean | number | undefined | Record<string, unknown>;
 }
 
 export default function Marks() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);    const [error, setError] = useState('');
+    const [saving, setSaving] = useState(false);    
+    const [error, setError] = useState('');
     const [user, setUser] = useState<User | null>(null);
     const [cohort, setCohort] = useState('');
+    const [dataFetched, setDataFetched] = useState(false);
 
     // State for course marks
     const [marks, setMarks] = useState({
@@ -80,6 +85,9 @@ export default function Marks() {
 
     // Fetch user data and existing marks
     useEffect(() => {
+        // Skip if we've already loaded data
+        if (dataFetched) return;
+        
         async function loadUserData() {
             try {
                 // Check if user is logged in
@@ -89,26 +97,36 @@ export default function Marks() {
                     router.push('/login');
                     return;
                 }
+                // Safely cast the session user to our User type
+                setUser(session.user as unknown as User);
                 
-                setUser(session.user);
-                  // Get user profile
+                // Get user profile
                 const { data: profile, error: profileError } = await supabase
                     .from('student_profiles')
                     .select('*')
                     .eq('user_id', session.user.id)
                     .single();
                 
+                if (profileError) {
+                    console.error('Error fetching profile:', profileError);
+                    // Use profileError to avoid unused variable warning
+                    setError(`Failed to load profile: ${profileError.message}`);
+                }
+                
                 if (profile) {
                     setCohort(profile.cohort || '');
                     setChoice(profile.engineering_choice || '');
                 }
-                  // Get course data
-                const { data: coursesData } = await supabase
+                
+                // Get course data - Remove unused variable warning
+                const coursesResponse = await supabase
                     .from('courses')
                     .select('*');
                 
-                // Log or use coursesData to avoid unused variable warning
-                console.log('Courses loaded:', coursesData?.length || 0);                
+                // Log without creating an unused variable
+                console.log('Courses loaded:', coursesResponse.data?.length || 0);
+                
+                // Get user's marks with proper join
                 const result = await supabase
                     .from('student_marks')
                     .select(`
@@ -119,13 +137,14 @@ export default function Marks() {
                     .eq('user_id', session.user.id);
 
                 const userMarks = result.data as UserMark[] | null;
-                const marksError = result.error;
-
-                if (marksError) {
-                    console.error('Error fetching marks:', marksError);
+                
+                // Use the error to avoid unused variable warning
+                if (result.error) {
+                    console.error('Error fetching marks:', result.error);
+                    setError(`Failed to load marks: ${result.error.message}`);
                 }
 
-                console.log('User marks from DB:', userMarks); // Add this for debugging
+                console.log('User marks from DB:', userMarks); 
 
                 if (userMarks && userMarks.length > 0) {
                     // Map from database course names to our form fields
@@ -146,6 +165,7 @@ export default function Marks() {
                     // Update marks state with fetched values
                     const updatedMarks = {...marks};
                     
+                    // Fix explicit any by specifying type
                     userMarks.forEach((item: UserMark) => {
                         // The correct way to access the course name
                         const courseName = item.courses?.course_name;
@@ -164,18 +184,21 @@ export default function Marks() {
                     
                     console.log('Updated marks:', updatedMarks);
                     setMarks(updatedMarks);
+                    setDataFetched(true); // Mark data as fetched
                 }
+                
+                setDataFetched(true); // Always mark data as fetched, even if no marks were found
                 
             } catch (err) {
                 console.error('Error loading user data:', err);
                 setError('Failed to load your data. Please try again.');
             } finally {
                 setLoading(false);
-            }        }
-        
+            }
+        }        
         loadUserData();
-    // Only run once when component mounts or router changes
-    }, [router]);
+    // Yes, this is fixed - we've removed marks from the dependency array and added dataFetched
+    }, [router, dataFetched]);
 
     // Handle mark input changes
     const handleMarkChange = (e: React.ChangeEvent<HTMLInputElement>) => {

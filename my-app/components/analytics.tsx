@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface AnalyticsProps {
@@ -29,6 +29,8 @@ export default function Analytics({ userId: initialUserId }: AnalyticsProps) {
     const [loading, setLoading] = useState(true);
     const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
     const [userId, setUserId] = useState<string>(initialUserId);
+    // Add useRef to store the userId for the effect
+    const userIdRef = useRef<string>(initialUserId);
 
     useEffect(() => {
         async function loadClassAverages() {
@@ -154,7 +156,10 @@ export default function Analytics({ userId: initialUserId }: AnalyticsProps) {
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 
                 if (authUser && initialUserId !== authUser.id) {
+                    // Update the state for rendering
                     setUserId(authUser.id);
+                    // Update the ref for use inside the effect
+                    userIdRef.current = authUser.id;
                 }
                 
                 let userYWA = null;
@@ -162,11 +167,11 @@ export default function Analytics({ userId: initialUserId }: AnalyticsProps) {
                 let distribution: {ywa: number, count: number}[] = [];
 
                 try {
-                    // Get user profile data with the correct userId
+                    // Get user profile data with the correct userId from the ref
                     const { data: userData } = await supabase
                         .from('student_profiles')
                         .select('id, year_weighted_avg, engineering_choice, cohort')
-                        .eq('user_id', userId)
+                        .eq('user_id', userIdRef.current)
                         .single();
 
                     userYWA = userData?.year_weighted_avg;
@@ -225,7 +230,7 @@ export default function Analytics({ userId: initialUserId }: AnalyticsProps) {
         }
         
         loadClassAverages();
-    }, [userId]);
+    }, [initialUserId]); // Only depend on initialUserId, not userId which changes in the effect
 
     if (loading) {
         return (
@@ -272,7 +277,7 @@ export default function Analytics({ userId: initialUserId }: AnalyticsProps) {
                         <div className="w-20 sm:w-24 text-center text-xs sm:text-sm font-medium text-white">2nd Cohort</div>
                     </div>
                     
-                    {['Lin Alg', 'Programming', 'Chem', 'Mats'].map((course, index) => {
+                    {['Lin Alg', 'Programming', 'Chem', 'Mats'].map((course) => {
                         if (!analytics?.courseAverages?.[course]) return null;
                         
                         const cohortData = analytics.courseAverages[course];
