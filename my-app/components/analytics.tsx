@@ -17,9 +17,9 @@ interface AnalyticsData {
         [courseName: string]: CourseAverage[];
     };
     studentCount?: number;
-    userYWA?: number;           // Add this line
-    userChoice?: string;        // Add this line
-    distribution?: {            // Add this line
+    userYWA?: number;           
+    userChoice?: string;        
+    distribution?: {            
         ywa: number;
         count: number;
     }[];
@@ -34,7 +34,6 @@ export default function Analytics({ userId }: AnalyticsProps) {
             try {
                 setLoading(true);
                 
-                // Core courses for cohort comparison
                 const coreCourses = ['Lin Alg', 'Programming', 'Chem', 'Mats'];
                 
                 // Get all available courses from database
@@ -58,7 +57,6 @@ export default function Analytics({ userId }: AnalyticsProps) {
                 
                 // Process all courses in the database
                 for (const course of allCourses) {
-                    // Get all marks for this course to calculate overall average
                     const { data: allMarksData } = await supabase
                         .from('student_marks')
                         .select(`
@@ -73,9 +71,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                         
                         courseAverages[course] = [{ cohort: 'Overall', avg_mark: avgMark }];
                         
-                        // If this is a core course, also get cohort-specific data
                         if (coreCourses.includes(course)) {
-                            // First, get the course ID
                             const { data: courseData } = await supabase
                                 .from('courses')
                                 .select('id')
@@ -84,9 +80,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                             
                             const courseId = courseData?.id;
                             
-                            // Only proceed if we found the course ID
                             if (courseId) {
-                                // Get all marks for this course with their user_id
                                 const { data: courseMarks, error: marksError } = await supabase
                                     .from('student_marks')
                                     .select('mark, user_id')
@@ -98,11 +92,9 @@ export default function Analytics({ userId }: AnalyticsProps) {
                                 }
                                 
                                 if (courseMarks && courseMarks.length > 0) {
-                                    // Get all user IDs who took this course
                                     const userIds = courseMarks.map(mark => mark.user_id).filter(Boolean);
                                     
                                     if (userIds.length > 0) {
-                                        // Get cohort info for these users
                                         const { data: profileData, error: profileError } = await supabase
                                             .from('student_profiles')
                                             .select('user_id, cohort')
@@ -113,13 +105,11 @@ export default function Analytics({ userId }: AnalyticsProps) {
                                             continue;
                                         }
                                         
-                                        // Create map of user_id to cohort
                                         const userCohorts: {[key: string]: string} = {};
                                         profileData?.forEach(profile => {
                                             userCohorts[profile.user_id] = profile.cohort;
                                         });
                                         
-                                        // Group marks by cohort
                                         const cohortMarks: {[key: string]: number[]} = {
                                             '1st': [],
                                             '2nd': []
@@ -139,7 +129,6 @@ export default function Analytics({ userId }: AnalyticsProps) {
                                                 cohortAvg = marks.reduce((sum, mark) => sum + mark, 0) / marks.length;
                                             }
                                             
-                                            // Add cohort average to course data
                                             courseAverages[course].push({
                                                 cohort,
                                                 avg_mark: cohortAvg
@@ -161,15 +150,12 @@ export default function Analytics({ userId }: AnalyticsProps) {
 
                 const studentCount = studentCountData?.length || 0;
                 
-                // Get current authenticated user to ensure correct ID is used
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 
-                // Use authenticated user ID if it doesn't match passed prop
                 if (authUser && userId !== authUser.id) {
                     userId = authUser.id;
                 }
                 
-                // Variables for user-specific data
                 let userYWA = null;
                 let userChoice = null; 
                 let distribution: {ywa: number, count: number}[] = [];
@@ -193,7 +179,6 @@ export default function Analytics({ userId }: AnalyticsProps) {
                             .eq('engineering_choice', userChoice)
                             .not('year_weighted_avg', 'is', null);
                         
-                        // Create distribution with 5% bands from real data
                         const bands: {[key: number]: number} = {};
                         
                         // Initialize bands from 60 to 95 in 5% increments
@@ -210,7 +195,6 @@ export default function Analytics({ userId }: AnalyticsProps) {
                                 bands[bandKey] = (bands[bandKey] || 0) + 1;
                             });
                             
-                            // Convert to array format for rendering
                             distribution = Object.entries(bands)
                                 .map(([band, count]) => ({
                                     ywa: parseInt(band),
@@ -250,7 +234,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
         );
     }
 
-    // Map actual engineering choice values to display names
+    // Map actual engineering
     const engineeringChoiceMap: {[key: string]: string} = {
       'Civl': 'Civil',
       'Mechanical': 'Mechanical',
@@ -261,12 +245,11 @@ export default function Analytics({ userId }: AnalyticsProps) {
       'Software': 'Software'
     };
 
-    // Get a display-friendly version of the choice
     const userChoiceDisplay = analytics?.userChoice ? (engineeringChoiceMap[analytics.userChoice] || analytics.userChoice) : '';
 
     return (
         <div className="space-y-5 sm:space-y-6">
-            {/* Overall Average - Centered */}
+            {/* Overall Average*/}
             <div className="bg-neutral-700 p-3 sm:p-4 rounded-lg text-center">
                 <h3 className="text-gray-300 text-sm mb-1">Class Overall Average</h3>
                 <div className="text-xl sm:text-2xl font-bold text-white">
@@ -277,7 +260,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                 </p>
             </div>
             
-            {/* Cohort Comparison - Mobile Friendly */}
+            {/* Cohort Comparison*/}
             <div className="bg-neutral-700 p-3 sm:p-5 rounded-lg">
                 <h3 className="text-white font-medium mb-2 sm:mb-3">Cohort Comparison</h3>
                 
@@ -314,7 +297,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                 </div>
             </div>
             
-            {/* All Course Averages - Auto-responsive Grid */}
+            {/* All Course Averages */}
             <div className="bg-neutral-700 p-3 sm:p-5 rounded-lg">
                 <h3 className="text-white font-medium mb-2 sm:mb-3">All Course Averages</h3>
                 
@@ -323,7 +306,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                         const overallAvg = data.find(d => d.cohort === 'Overall')?.avg_mark || 0;
                         let courseColor = 'bg-gray-500';
                         
-                        // Assign colors based on course name for the progress bar only
+                        // Assign colors based on course
                         if (courseName === 'Lin Alg') courseColor = 'bg-purple-600';
                         else if (courseName === 'Programming') courseColor = 'bg-blue-600';
                         else if (courseName === 'Chem') courseColor = 'bg-green-600';
@@ -362,7 +345,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                 </div>
             </div>
             
-            {/* Engineering Choice Average (replacing distribution chart) - Mobile Friendly */}
+            {/* Engineering Choice Average*/}
             <div className="bg-neutral-700 p-3 sm:p-5 rounded-lg relative">
                 <h3 className="text-white font-medium mb-2 sm:mb-3">
                     {analytics?.userChoice ? 
@@ -374,7 +357,6 @@ export default function Analytics({ userId }: AnalyticsProps) {
                     analytics?.distribution && analytics.distribution.length > 0 ? (
                         <div className="bg-neutral-600 rounded-lg p-3 sm:p-4">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                                {/* Left - Average info */}
                                 <div className="flex-1">
                                     <div className="text-sm text-gray-300 mb-1">Average YWA</div>
                                     <div className="text-2xl sm:text-3xl font-bold text-white">
@@ -389,13 +371,11 @@ export default function Analytics({ userId }: AnalyticsProps) {
                                     </div>
                                 </div>
                                 
-                                {/* Right - User comparison */}
                                 {analytics?.userYWA && (
                                     <div className="text-center px-4 sm:px-5 py-2 sm:py-3 bg-neutral-700 rounded-lg">
                                         <div className="text-xs sm:text-sm text-gray-300 mb-1">Your YWA</div>
                                         <div className="text-xl sm:text-2xl font-bold text-white">{analytics.userYWA.toFixed(1)}%</div>
                                         
-                                        {/* User vs Average comparison */}
                                         {analytics.distribution && analytics.distribution.length > 0 && (() => {
                                             const avgYWA = analytics.distribution.reduce((sum, p) => sum + (p.ywa * p.count), 0) / 
                                                           analytics.distribution.reduce((sum, p) => sum + p.count, 0);
@@ -411,7 +391,7 @@ export default function Analytics({ userId }: AnalyticsProps) {
                                 )}
                             </div>
                             
-                            {/* Progress bar showing where user stands */}
+                            {/* Progress bar*/}
                             {analytics?.userYWA && (
                                 <div className="mt-3 sm:mt-4">
                                     <div className="flex justify-between text-xs text-gray-400 mb-1">
