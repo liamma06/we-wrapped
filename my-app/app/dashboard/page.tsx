@@ -38,7 +38,6 @@ export default function Dashboard(){
                 setFirstLogin(firstTime);
 
             } catch (error) {
-                console.error("Error checking user status:", error);
                 router.push('/login');
             } finally {
                 setLoading(false);
@@ -110,7 +109,6 @@ export default function Dashboard(){
                         <div className="bg-neutral-700 p-3 sm:p-5 rounded-lg mb-4 sm:mb-6">
                             <h2 className="text-lg sm:text-xl text-white font-medium mb-3 sm:mb-4">Your Analytics</h2>
                             
-                            {/* Analytics Component */}
                             <div className="rounded-lg">
                                 {user?.id && <Analytics userId={user.id} />}
                             </div>

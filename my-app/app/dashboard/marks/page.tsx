@@ -108,7 +108,6 @@ export default function Marks() {
                     .single();
                 
                 if (profileError) {
-                    console.error('Error fetching profile:', profileError);
                     // Use profileError to avoid unused variable warning
                     setError(`Failed to load profile: ${profileError.message}`);
                 }
@@ -123,8 +122,6 @@ export default function Marks() {
                     .from('courses')
                     .select('*');
                 
-                // Log without creating an unused variable
-                console.log('Courses loaded:', coursesResponse.data?.length || 0);
                 
                 // Get user's marks with proper join
                 const result = await supabase
@@ -140,11 +137,9 @@ export default function Marks() {
                 
                 // Use the error to avoid unused variable warning
                 if (result.error) {
-                    console.error('Error fetching marks:', result.error);
                     setError(`Failed to load marks: ${result.error.message}`);
                 }
 
-                console.log('User marks from DB:', userMarks); 
 
                 if (userMarks && userMarks.length > 0) {
                     // Map from database course names to our form fields
@@ -169,7 +164,6 @@ export default function Marks() {
                     userMarks.forEach((item: UserMark) => {
                         // The correct way to access the course name
                         const courseName = item.courses?.course_name;
-                        console.log('Course found:', courseName, 'with mark:', item.mark);
                         
                         if (courseName) {
                           const formField = courseMapping[courseName];
@@ -177,12 +171,10 @@ export default function Marks() {
                           if (formField) {
                             // Use type assertion to tell TypeScript this is a valid key
                             updatedMarks[formField as keyof typeof marks] = item.mark.toString();
-                            console.log('Setting field:', formField, 'to value:', item.mark.toString());
                           }
                         }
                     });
                     
-                    console.log('Updated marks:', updatedMarks);
                     setMarks(updatedMarks);
                     setDataFetched(true); // Mark data as fetched
                 }
@@ -190,7 +182,6 @@ export default function Marks() {
                 setDataFetched(true); // Always mark data as fetched, even if no marks were found
                 
             } catch (err) {
-                console.error('Error loading user data:', err);
                 setError('Failed to load your data. Please try again.');
             } finally {
                 setLoading(false);
@@ -292,7 +283,6 @@ export default function Marks() {
             router.push('/dashboard');
             
         } catch (err) {
-            console.error('Error saving marks:', err);
             setError('Failed to save your marks. Please try again.');
         } finally {
             setSaving(false);
